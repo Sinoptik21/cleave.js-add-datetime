@@ -209,7 +209,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        pps.timeFormatter = new TimeFormatter(pps.timePattern, pps.timeFormat);
-	        pps.blocks = pps.timeFormatter.getBlocks();
+
+	        var timeFormatterBlocks = pps.timeFormatter.getBlocks();
+	        if (!pps.date) {
+	            pps.blocks = timeFormatterBlocks;
+	        } else {
+	            pps.blocks = pps.blocks.concat(timeFormatterBlocks);
+	        }
+
 	        pps.blocksLength = pps.blocks.length;
 	        pps.maxLength = Util.getMaxLength(pps.blocks);
 	    },
@@ -297,6 +304,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	            pps = owner.properties;
 
 	        return pps.time ? pps.timeFormatter.getISOFormatTime() : '';
+	    },
+
+	    getISOFormatDateTime: function getISOFormatDateTime() {
+	        var owner = this,
+	            pps = owner.properties;
+
+	        if (pps.date && pps.time) {
+	            var formattedDateTime = '';
+
+	            var date = owner.getISOFormatDate();
+	            var time = owner.getISOFormatTime();
+
+	            if (date) formattedDateTime += date;
+
+	            if (time) formattedDateTime += 'T' + time;
+
+	            return formattedDateTime;
+	        }
+
+	        return '';
 	    },
 
 	    onInit: function onInit(owner) {
@@ -399,13 +426,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return;
 	        }
 
-	        // date
-	        if (pps.date) {
+	        // date and time
+	        if (pps.date && pps.time) {
+	            value = Util.getDateTimeValue(value, pps.dateFormatter, pps.timeFormatter, pps.delimiters);
+	        } else if (pps.date) {
+	            // only date
 	            value = pps.dateFormatter.getValidatedDate(value);
-	        }
-
-	        // time
-	        if (pps.time) {
+	        } else if (pps.time) {
+	            // only time
 	            value = pps.timeFormatter.getValidatedTime(value);
 	        }
 
@@ -1959,6 +1987,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.blocks;
 	    },
 
+	    getMaxStringLength: function getMaxStringLength() {
+	        return this.getBlocks().reduce(function (a, b) {
+	            return a + b;
+	        }, 0);
+	    },
+
 	    getValidatedDate: function getValidatedDate(value) {
 	        var owner = this,
 	            result = '';
@@ -2581,6 +2615,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	                value = value.replace(owner.getDelimiterREByDelimiter(letter), '');
 	            });
 	        });
+
+	        return value;
+	    },
+
+	    getDateTimeValue: function getDateTimeValue(value, dateFormatter, timeFormatter, delimiters) {
+
+	        var splitDelimiterIndex = dateFormatter.getBlocks().length - 1;
+	        var splitDelimiter = delimiters[splitDelimiterIndex];
+
+	        var dateMaxStringLength = dateFormatter.getMaxStringLength();
+
+	        var splittedValues = value.split(splitDelimiter);
+
+	        // Split even if it is raw value
+	        if (splittedValues.length == 1 && value.length > dateMaxStringLength) {
+	            splittedValues = [value.substring(0, dateMaxStringLength), value.substring(dateMaxStringLength)];
+	        }
+
+	        var dateValue = splittedValues[0] ? dateFormatter.getValidatedDate(splittedValues[0]) : '';
+	        var timeValue = splittedValues[1] ? timeFormatter.getValidatedTime(splittedValues[1]) : '';
+
+	        if (timeValue) value = dateValue + timeValue;else value = dateValue;
 
 	        return value;
 	    },

@@ -71,11 +71,12 @@ var Util = {
 
     getDateTimeValue: function (value, dateFormatter, timeFormatter, delimiters) {
 
-        value = value.replace(/\D/g, '')
+        value = value.replace(/\D/g, '');
+
         var splitDelimiterIndex = dateFormatter.getBlocks().length - 1;
         var splitDelimiter = delimiters[splitDelimiterIndex];
 
-        var dateMaxStringLength = dateFormatter.getMaxStringLength(delimiters);
+        var dateMaxStringLength = dateFormatter.getMaxStringLength();
 
         var splittedValues = value.split(splitDelimiter);
 

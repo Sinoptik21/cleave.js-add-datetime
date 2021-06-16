@@ -50,9 +50,7 @@ DateFormatter.prototype = {
         return this.blocks;
     },
 
-    getMaxStringLength: function (delimiters) {
-        var dateDelimiters = delimiters.slice(0, this.getBlocks().length - 1);
-        var dateDelimitersLength = dateDelimiters.join('').length || 0;
+    getMaxStringLength: function () {
         return this.getBlocks().reduce(function(a, b) {
             return a + b;
         }, 0);

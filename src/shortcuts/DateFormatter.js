@@ -21,7 +21,7 @@ var DateFormatter = function (datePattern, dateMin, dateMax) {
         return parseInt(x, 10);
       });
     if (owner.dateMax.length === 2) owner.dateMax.unshift(0);
-    
+
     owner.initBlocks();
 };
 
@@ -50,7 +50,9 @@ DateFormatter.prototype = {
         return this.blocks;
     },
 
-    getMaxStringLength: function () {
+    getMaxStringLength: function (delimiters) {
+        var dateDelimiters = delimiters.slice(0, this.getBlocks().length - 1);
+        var dateDelimitersLength = dateDelimiters.join('').length || 0;
         return this.getBlocks().reduce(function(a, b) {
             return a + b;
         }, 0);

@@ -742,7 +742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return parseInt(x, 10);
 	      });
 	    if (owner.dateMax.length === 2) owner.dateMax.unshift(0);
-	    
+
 	    owner.initBlocks();
 	};
 
@@ -771,7 +771,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.blocks;
 	    },
 
-	    getMaxStringLength: function () {
+	    getMaxStringLength: function (delimiters) {
+	        var dateDelimiters = delimiters.slice(0, this.getBlocks().length - 1);
+	        var dateDelimitersLength = dateDelimiters.join('').length || 0;
 	        return this.getBlocks().reduce(function(a, b) {
 	            return a + b;
 	        }, 0);
@@ -1402,10 +1404,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    getDateTimeValue: function (value, dateFormatter, timeFormatter, delimiters) {
 
+	        value = value.replace(/\D/g, '')
 	        var splitDelimiterIndex = dateFormatter.getBlocks().length - 1;
 	        var splitDelimiter = delimiters[splitDelimiterIndex];
 
-	        var dateMaxStringLength = dateFormatter.getMaxStringLength();
+	        var dateMaxStringLength = dateFormatter.getMaxStringLength(delimiters);
 
 	        var splittedValues = value.split(splitDelimiter);
 
